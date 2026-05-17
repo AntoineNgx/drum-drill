@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Antoine's Daily Drum Drill</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --red: #E8440A;
+    --red-dim: rgba(232,68,10,0.15);
+    --red-border: rgba(232,68,10,0.3);
+    --bg: #0A0A0B;
+    --surface: #111114;
+    --surface2: #18181C;
+    --border: rgba(255,255,255,0.06);
+    --text: #F0EDE8;
+    --muted: #6A6870;
+    --green: #2ECC71;
+    --green-dim: rgba(46,204,113,0.12);
+    --amber: #F0A500;
+    --amber-dim: rgba(240,165,0,0.12);
+    --blue: #4A9EFF;
+    --blue-dim: rgba(74,158,255,0.12);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    padding: 36px 24px 28px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::after {
+    content: '🥁';
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 80px;
+    opacity: 0.07;
+  }
+  .header-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(36px, 7vw, 64px);
+    letter-spacing: 2px;
+    line-height: 1;
+    color: var(--text);
+  }
+  .header-sub {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: 'DM Mono', monospace;
+  }
+  .header-sub span { color: var(--red); }
+
+  /* ─── STATS BAR ─── */
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .stats-bar::-webkit-scrollbar { display: none; }
+  .stat-item {
+    flex: 1;
+    min-width: 70px;
+    padding: 14px 12px;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-val {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 26px;
+    color: var(--red);
+    line-height: 1;
+  }
+  .stat-key {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ─── TABS ─── */
+  .tab-nav {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .tab-btn {
+    flex: 1;
+    padding: 14px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    color: var(--red);
+    border-bottom-color: var(--red);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ─── MAIN ─── */
+  .main { max-width: 800px; margin: 0 auto; padding: 24px 16px; }
+
+  /* ─── SUGGESTION ROW ─── */
+  .suggestion-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+  .suggestion-row::-webkit-scrollbar { display: none; }
+  .suggestion-chip {
+    flex-shrink: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 110px;
+  }
+  .suggestion-chip.has-history { border-color: var(--blue-dim); background: var(--blue-dim); }
+  .suggestion-chip-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .suggestion-chip-bpm {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    color: var(--blue);
+    line-height: 1;
+  }
+  .suggestion-chip.has-history .suggestion-chip-label { color: var(--blue); }
+  .suggestion-chip-reason {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ─── TIMER ─── */
+  .timer-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s;
+  }
+  .timer-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--red), transparent);
+  }
+  .timer-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .timer-display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    line-height: 1;
+    color: var(--text);
+    letter-spacing: 4px;
+    transition: color 0.3s;
+  }
+  .timer-display.running { color: var(--red); }
+  .timer-display.warning { color: var(--amber); }
+  .timer-display.done { color: var(--green); }
+
+  .timer-block-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--muted);
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    min-height: 26px;
+  }
+  .timer-block-name.active { color: var(--red); }
+
+  .timer-bpm-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--blue);
+    margin-bottom: 16px;
+    min-height: 18px;
+  }
+
+  .timer-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+  .btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:hover, .btn:active { border-color: rgba(255,255,255,0.2); }
+  .btn.primary {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+  }
+  .btn.primary:hover { background: #FF5520; }
+  .btn.success {
+    background: var(--green-dim);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .btn.blue {
+    background: var(--blue-dim);
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  .progress-bar {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 3px;
+    margin: 16px 0 0;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 3px;
+    transition: width 1s linear;
+    width: 0%;
+  }
+
+  /* ─── BLOCK LOG PANEL ─── */
+  .block-log-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--amber);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .block-log-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--amber), transparent);
+  }
+  .block-log-panel.show { display: block; }
+
+  .log-panel-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: var(--amber);
+    margin-bottom: 6px;
+  }
+  .log-panel-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+  }
+
+  .log-form-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .log-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 120px;
+  }
+  .log-form-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .bpm-input {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 40px;
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 2px;
+    -moz-appearance: textfield;
+  }
+  .bpm-input::-webkit-inner-spin-button,
+  .bpm-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  .bpm-input:focus {
+    outline: none;
+    border-color: var(--amber);
+  }
+  .bpm-stepper {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 6px;
+  }
+  .bpm-step-btn {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .bpm-step-btn:active { background: var(--surface); }
+
+  .rating-group { flex: 2; min-width: 220px; }
+  .rating-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .rating-btn {
+    flex: 1;
+    padding: 10px 4px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .rating-btn .rating-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    display: block;
+    line-height: 1;
+  }
+  .rating-btn .rating-desc {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+  .rating-btn.selected-1 { border-color: #FF4444; background: rgba(255,68,68,0.12); color: #FF4444; }
+  .rating-btn.selected-2 { border-color: var(--amber); background: var(--amber-dim); color: var(--amber); }
+  .rating-btn.selected-3 { border-color: #7EEAA8; background: rgba(126,234,168,0.1); color: #7EEAA8; }
+  .rating-btn.selected-4 { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+  .rating-btn.selected-5 { border-color: var(--blue); background: var(--blue-dim); color: var(--blue); }
+
+  .log-panel-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* ─── SESSION COMPLETE PANEL ─── */
+  .session-complete-panel {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--green);
+    border-radius: 16px;
+    padding: 24px 20px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .session-complete-panel::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), transparent);
+  }
+  .session-complete-panel.show { display: block; }
+
+  .complete-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--green);
+    margin-bottom: 4px;
+  }
+  .complete-streak {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #7EEAA8;
+    margin-bottom: 20px;
+  }
+
+  .session-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .summary-block {
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    padding: 12px 14px;
+  }
+  .summary-block-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .summary-block-bpm {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .summary-block-rating { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .feedback-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .feedback-textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.55;
+    resize: vertical;
+    min-height: 80px;
+    margin-bottom: 16px;
+  }
+  .feedback-textarea:focus {
+    outline: none;
+    border-color: var(--green);
+  }
+  .feedback-textarea::placeholder { color: var(--muted); }
+
+  /* ─── BLOCKS ─── */
+  .blocks { display: flex; flex-direction: column; gap: 10px; }
+
+  .block-card {
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.3s;
+    cursor: pointer;
+  }
+  .block-card.active-block { border-color: var(--red); }
+  .block-card.completed-block { border-color: var(--green); opacity: 0.7; }
+
+  .block-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+  }
+  .block-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 30px;
+    color: var(--muted);
+    line-height: 1;
+    min-width: 26px;
+    transition: color 0.3s;
+  }
+  .block-card.active-block .block-num { color: var(--red); }
+  .block-card.completed-block .block-num { color: var(--green); }
+
+  .block-info { flex: 1; }
+  .block-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .block-meta {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .block-card.active-block .block-meta { color: var(--red); }
+
+  .block-right { text-align: right; }
+  .block-duration {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    color: var(--muted);
+  }
+  .block-card.active-block .block-duration { color: var(--red); }
+  .block-suggested-bpm {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--blue);
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  .block-body {
+    padding: 0 18px 16px 58px;
+    display: none;
+  }
+  .block-card.active-block .block-body,
+  .block-card.expanded .block-body { display: block; }
+
+  .drill-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  .drill-item {
+    font-size: 13px;
+    color: #C0BDB8;
+    line-height: 1.55;
+    padding-left: 14px;
+    position: relative;
+  }
+  .drill-item::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--red);
+    font-size: 11px;
+  }
+  .drill-item strong { color: var(--text); }
+
+  .focus-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: var(--red-dim);
+    border: 1px solid var(--red-border);
+    color: var(--red);
+    margin-top: 10px;
+  }
+
+  /* ─── PROGRESS SECTION ─── */
+  .section {
+    margin-top: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+  }
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  /* ─── TARGETS ─── */
+  .target-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .target-row:last-child { margin-bottom: 0; }
+  .target-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--muted);
+    min-width: 110px;
+  }
+  .target-bar { flex: 1; height: 6px; background: var(--border); border-radius: 6px; overflow: hidden; }
+  .target-fill { height: 100%; border-radius: 6px; background: var(--red); transition: width 0.5s; }
+  .target-now {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    min-width: 48px;
+    text-align: right;
+  }
+  .target-goal {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--red);
+    min-width: 48px;
+    text-align: right;
+  }
+
+  .rule-box {
+    margin-top: 14px;
+    padding: 14px 16px;
+    background: var(--red-dim);
+    border: 1px solid var(--red-border);
+    border-radius: 10px;
+  }
+  .rule-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 6px;
+  }
+  .rule-text { font-size: 13px; color: #E0DCD6; line-height: 1.55; }
+
+  /* ─── PER-EXERCISE PROGRESS ─── */
+  .exercise-progress-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  @media (min-width: 600px) {
+    .exercise-progress-grid { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  }
+  .ex-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 12px;
+  }
+  .ex-card-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .ex-card-bpm {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    color: var(--text);
+    line-height: 1;
+  }
+  .ex-card-bpm-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .ex-card-suggest {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+  .ex-card-suggest-arrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .ex-card-suggest-bpm {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .suggest-up { color: var(--green); }
+  .suggest-hold { color: var(--amber); }
+  .suggest-down { color: #FF4444; }
+  .ex-card-sessions {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    color: var(--muted);
+  }
+  .mini-rating-dots {
+    display: flex;
+    gap: 3px;
+    margin-top: 6px;
+  }
+  .mini-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+  .mini-dot.r1 { background: #FF4444; }
+  .mini-dot.r2 { background: var(--amber); }
+  .mini-dot.r3 { background: #7EEAA8; }
+  .mini-dot.r4 { background: var(--green); }
+  .mini-dot.r5 { background: var(--blue); }
+
+  /* ─── HISTORY ─── */
+  .history-list { display: flex; flex-direction: column; gap: 12px; }
+  .history-entry {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .history-entry-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .history-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+  .history-streak {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--red);
+    letter-spacing: 1px;
+  }
+  .history-blocks-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+  .history-block-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+  .history-block-chip .chip-bpm { color: var(--text); font-size: 11px; }
+  .history-feedback {
+    font-size: 12px;
+    color: #8A8788;
+    font-style: italic;
+    padding-top: 8px;
+    border-top: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
+  .history-empty {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+    text-align: center;
+    padding: 24px;
+  }
+
+  /* ─── SESSION LOG ─── */
+  .log-entries { display: flex; flex-direction: column; gap: 6px; max-height: 200px; overflow-y: auto; }
+  .log-entry {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    padding: 6px 10px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border-left: 2px solid var(--border);
+  }
+  .log-entry.success { border-left-color: var(--green); color: #7EEAA8; }
+  .log-entry.info { border-left-color: var(--red); color: #C0BDB8; }
+  .log-empty { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); font-style: italic; }
+
+  .streak-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  .streak-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    color: var(--red);
+    line-height: 1;
+  }
+  .streak-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; }
+
+  /* ─── SCIENCE BOX ─── */
+  .science-box {
+    margin-top: 20px;
+    padding: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .science-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .science-rule {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 12px;
+    color: #C0BDB8;
+    line-height: 1.4;
+  }
+  .science-rule:last-child { margin-bottom: 0; }
+  .science-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 14px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    min-width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .badge-red { background: rgba(255,68,68,0.2); color: #FF6666; }
+  .badge-amber { background: var(--amber-dim); color: var(--amber); }
+  .badge-green { background: var(--green-dim); color: var(--green); }
+  .badge-blue { background: var(--blue-dim); color: var(--blue); }
+
+  /* ─── DATA CONTROLS ─── */
+  .data-controls {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-sm {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-sm:hover { color: var(--text); border-color: rgba(255,255,255,0.15); }
+  .btn-sm.danger { color: #FF6666; border-color: rgba(255,68,68,0.2); }
+  .btn-sm.danger:hover { background: rgba(255,68,68,0.1); }
+
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .pulsing { animation: pulse 1s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">Antoine · Daily Practice Protocol</div>
+  <h1>10-MIN DRUM DRILL</h1>
+  <div class="header-sub">Intermediate · Pad only · <span>Block 2 is non-negotiable</span></div>
+</div>
+
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-val">10</div>
+    <div class="stat-key">Minutes</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" id="streak-stat">0</div>
+    <div class="stat-key">Streak</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" id="sessions-stat">0</div>
+    <div class="stat-key">Sessions</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" id="avg-rating-stat">—</div>
+    <div class="stat-key">Avg Rating</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-val" id="best-bpm-stat">—</div>
+    <div class="stat-key">Top BPM</div>
+  </div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('today')">Today</button>
+  <button class="tab-btn" onclick="switchTab('progress')">Progress</button>
+  <button class="tab-btn" onclick="switchTab('history')">History</button>
+</div>
+
+<!-- ═══ TAB: TODAY ═══ -->
+<div class="tab-panel active" id="tab-today">
+<div class="main">
+
+  <!-- SUGGESTED BPM CHIPS -->
+  <div class="suggestion-row" id="suggestion-row"></div>
+
+  <!-- TIMER -->
+  <div class="timer-section" id="timer-section">
+    <div class="timer-label">Current Block</div>
+    <div class="timer-block-name" id="timer-block-name">Press Start to Begin</div>
+    <div class="timer-bpm-hint" id="timer-bpm-hint"></div>
+    <div class="timer-display" id="timer-display">02:00</div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    <br>
+    <div class="timer-controls">
+      <button class="btn primary" id="start-btn" onclick="startTimer()">▶ Start</button>
+      <button class="btn" id="pause-btn" onclick="pauseTimer()" style="display:none">⏸ Pause</button>
+      <button class="btn" onclick="skipBlock()">Skip →</button>
+      <button class="btn" onclick="resetAll()">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- BLOCK LOG PANEL (appears after each block) -->
+  <div class="block-log-panel" id="block-log-panel">
+    <div class="log-panel-title" id="log-panel-title">Log Block 1</div>
+    <div class="log-panel-sub" id="log-panel-sub">How did it go? Log your actual BPM and rate the session.</div>
+
+    <div class="log-form-row">
+      <div class="log-form-group">
+        <div class="log-form-label">BPM Played</div>
+        <input type="number" class="bpm-input" id="bpm-input" min="40" max="300" value="100">
+        <div class="bpm-stepper">
+          <button class="bpm-step-btn" onclick="adjustBpm(-5)">−5</button>
+          <button class="bpm-step-btn" onclick="adjustBpm(-1)">−1</button>
+          <button class="bpm-step-btn" onclick="adjustBpm(1)">+1</button>
+          <button class="bpm-step-btn" onclick="adjustBpm(5)">+5</button>
+        </div>
+      </div>
+      <div class="log-form-group rating-group">
+        <div class="log-form-label">How did it feel?</div>
+        <div class="rating-buttons">
+          <button class="rating-btn" onclick="selectRating(1)">
+            <span class="rating-num">1</span>
+            <span class="rating-desc">Can't play</span>
+          </button>
+          <button class="rating-btn" onclick="selectRating(2)">
+            <span class="rating-num">2</span>
+            <span class="rating-desc">Limited</span>
+          </button>
+          <button class="rating-btn" onclick="selectRating(3)">
+            <span class="rating-num">3</span>
+            <span class="rating-desc">Good</span>
+          </button>
+          <button class="rating-btn" onclick="selectRating(4)">
+            <span class="rating-num">4</span>
+            <span class="rating-desc">Better+</span>
+          </button>
+          <button class="rating-btn" onclick="selectRating(5)">
+            <span class="rating-num">5</span>
+            <span class="rating-desc">Excellent</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="log-panel-actions">
+      <button class="btn primary" onclick="submitBlockLog(false)">Log & Continue →</button>
+      <button class="btn" onclick="submitBlockLog(true)">Skip Log</button>
+    </div>
+  </div>
+
+  <!-- SESSION COMPLETE PANEL -->
+  <div class="session-complete-panel" id="session-complete-panel">
+    <div class="complete-title">Session Complete 🔥</div>
+    <div class="complete-streak" id="complete-streak-text"></div>
+
+    <div class="session-summary-grid" id="session-summary-grid"></div>
+
+    <div class="feedback-label">Session Notes (optional)</div>
+    <textarea class="feedback-textarea" id="feedback-textarea" placeholder="How did it feel? What clicked? What needs work?"></textarea>
+
+    <div class="timer-controls">
+      <button class="btn success" onclick="saveSession()">✓ Save Session</button>
+      <button class="btn" onclick="resetAll()">↺ New Session</button>
+    </div>
+  </div>
+
+  <!-- BLOCKS -->
+  <div class="blocks" id="blocks-container">
+
+    <div class="block-card expanded" id="block-0" onclick="toggleExpand(0)">
+      <div class="block-header">
+        <div class="block-num">1</div>
+        <div class="block-info">
+          <div class="block-title">Single Stroke Speed Builder</div>
+          <div class="block-meta">Foundation · Priority block</div>
+        </div>
+        <div class="block-right">
+          <div class="block-duration">3 min</div>
+          <div class="block-suggested-bpm" id="block-suggest-0"></div>
+        </div>
+      </div>
+      <div class="block-body">
+        <ul class="drill-list">
+          <li class="drill-item"><strong>Min 1–2:</strong> Speed builder sheet top to bottom at your current clean ceiling. Focus on even volume, both hands identical.</li>
+          <li class="drill-item"><strong>Min 3:</strong> Push +5 BPM, last line only. If it holds clean for the full minute, that becomes your new ceiling next session.</li>
+          <li class="drill-item">Tempo up only when the current level is solid — clean beats fast.</li>
+        </ul>
+        <div class="focus-tag">Target: 130 BPM 16th notes</div>
+      </div>
+    </div>
+
+    <div class="block-card" id="block-1" onclick="toggleExpand(1)">
+      <div class="block-header">
+        <div class="block-num">2</div>
+        <div class="block-info">
+          <div class="block-title">Paradiddle Accents</div>
+          <div class="block-meta">Limb independence · Non-negotiable</div>
+        </div>
+        <div class="block-right">
+          <div class="block-duration">3 min</div>
+          <div class="block-suggested-bpm" id="block-suggest-1"></div>
+        </div>
+      </div>
+      <div class="block-body">
+        <ul class="drill-list">
+          <li class="drill-item"><strong>Min 1:</strong> RLRR LRLL — accent beat 1 of each group. <strong>R</strong>lrr <strong>L</strong>rll.</li>
+          <li class="drill-item"><strong>Min 2:</strong> Shift accent to beat 3 — rl<strong>R</strong>r lr<strong>L</strong>l. Slow down if needed.</li>
+          <li class="drill-item"><strong>Min 3:</strong> Alternate both accent patterns every 4 bars.</li>
+          <li class="drill-item">Stay slow. 80 BPM clean beats 100 BPM sloppy every time.</li>
+        </ul>
+        <div class="focus-tag">This block moves the needle most — never skip it</div>
+      </div>
+    </div>
+
+    <div class="block-card" id="block-2" onclick="toggleExpand(2)">
+      <div class="block-header">
+        <div class="block-num">3</div>
+        <div class="block-info">
+          <div class="block-title">Fill Simulation — 3+1</div>
+          <div class="block-meta">Musical context · Fills</div>
+        </div>
+        <div class="block-right">
+          <div class="block-duration">2 min</div>
+          <div class="block-suggested-bpm" id="block-suggest-2"></div>
+        </div>
+      </div>
+      <div class="block-body">
+        <ul class="drill-list">
+          <li class="drill-item">Tap foot as kick on beats 1 and 3. Play 3 bars of rock beat in your head, then 1 bar fill on the pad.</li>
+          <li class="drill-item"><strong>Mon/Thu:</strong> 16th note singles. <strong>Tue/Fri:</strong> Paradiddle as fill. <strong>Wed/Sat:</strong> Singles with accent on 2 and 4.</li>
+          <li class="drill-item">The 3+1 structure trains fill entry and exit within music — not just in isolation.</li>
+        </ul>
+        <div class="focus-tag">Target: clean fill entry and exit at 120 BPM</div>
+      </div>
+    </div>
+
+    <div class="block-card" id="block-3" onclick="toggleExpand(3)">
+      <div class="block-header">
+        <div class="block-num">4</div>
+        <div class="block-info">
+          <div class="block-title">Double Stroke Endurance</div>
+          <div class="block-meta">Ceiling expansion · Rebound focus</div>
+        </div>
+        <div class="block-right">
+          <div class="block-duration">2 min</div>
+          <div class="block-suggested-bpm" id="block-suggest-3"></div>
+        </div>
+      </div>
+      <div class="block-body">
+        <ul class="drill-list">
+          <li class="drill-item">RRLL RRLL — every 30 seconds add 5 BPM. Stop the moment the second stroke loses rebound, drop back 10 BPM and finish there.</li>
+          <li class="drill-item">The second stroke is pure rebound — do not muscle it. Let the stick bounce naturally.</li>
+          <li class="drill-item">Chase <strong>clean doubles</strong>, not the BPM number. Speed follows technique.</li>
+        </ul>
+        <div class="focus-tag">Target: clean doubles at 110 BPM</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LIVE SESSION LOG -->
+  <div class="section">
+    <div class="section-title">Session Log</div>
+    <div class="streak-display">
+      <div class="streak-num" id="streak-display">0</div>
+      <div class="streak-label">day<br>streak</div>
+    </div>
+    <div class="log-entries" id="log-entries">
+      <div class="log-empty">No sessions yet. Start your first drill.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══ TAB: PROGRESS ═══ -->
+<div class="tab-panel" id="tab-progress">
+<div class="main">
+
+  <div class="section">
+    <div class="section-title">Per-Exercise Progress</div>
+    <div class="exercise-progress-grid" id="exercise-progress-grid">
+      <!-- rendered by JS -->
+    </div>
+
+    <div class="science-box">
+      <div class="science-title">BPM Progression Science (Ericsson + Drum Research)</div>
+      <div class="science-rule">
+        <span class="science-badge badge-red">1</span>
+        <span>Can't play → Drop −10 BPM. Technique breaks before speed.</span>
+      </div>
+      <div class="science-rule">
+        <span class="science-badge badge-amber">2</span>
+        <span>Limited comfort → Drop −5 BPM. Consolidate before advancing.</span>
+      </div>
+      <div class="science-rule">
+        <span class="science-badge" style="background:rgba(126,234,168,0.1);color:#7EEAA8;">3</span>
+        <span>Good → Hold tempo. 2 clean sessions needed before stepping up.</span>
+      </div>
+      <div class="science-rule">
+        <span class="science-badge badge-green">4</span>
+        <span>Better than good → After 2 consecutive sessions at 4+: advance +3 BPM.</span>
+      </div>
+      <div class="science-rule">
+        <span class="science-badge badge-blue">5</span>
+        <span>Excellent → After 3 consecutive sessions at 4+: advance +5 BPM.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3-Month Targets</div>
+    <div id="targets-container">
+      <!-- rendered by JS -->
+    </div>
+    <div class="rule-box">
+      <div class="rule-label">The One Rule</div>
+      <div class="rule-text">Never skip Block 2. Blocks 1, 3, and 4 maintain your current level. Block 2 is the only one that actively develops limb independence. Everything else is optional on a bad day. Block 2 is not.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══ TAB: HISTORY ═══ -->
+<div class="tab-panel" id="tab-history">
+<div class="main">
+
+  <div class="section">
+    <div class="section-title">Session History</div>
+    <div class="history-list" id="history-list">
+      <div class="history-empty">No sessions logged yet. Complete your first drill.</div>
+    </div>
+    <div class="data-controls">
+      <button class="btn-sm" onclick="exportData()">↓ Export JSON</button>
+      <button class="btn-sm" onclick="importData()">↑ Import JSON</button>
+      <button class="btn-sm danger" onclick="clearData()">✕ Clear All Data</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ─── CONFIG ────────────────────────────────────────────────────────────
+const BLOCKS = [
+  {
+    name: 'Block 1 — Single Stroke',
+    shortName: 'Single Stroke',
+    duration: 180,
+    defaultBpm: 110,
+    minBpm: 60,
+    targetBpm: 130,
+    bpmRange: '110–115 BPM'
+  },
+  {
+    name: 'Block 2 — Paradiddle Accents',
+    shortName: 'Paradiddle',
+    duration: 180,
+    defaultBpm: 85,
+    minBpm: 60,
+    targetBpm: 110,
+    bpmRange: '80–90 BPM'
+  },
+  {
+    name: 'Block 3 — Fill Simulation',
+    shortName: 'Fill 3+1',
+    duration: 120,
+    defaultBpm: 105,
+    minBpm: 70,
+    targetBpm: 120,
+    bpmRange: '100–110 BPM'
+  },
+  {
+    name: 'Block 4 — Double Stroke',
+    shortName: 'Double Stroke',
+    duration: 120,
+    defaultBpm: 80,
+    minBpm: 50,
+    targetBpm: 110,
+    bpmRange: '80–95 BPM'
+  },
+];
+
+const RATING_LABELS = ['', "Can't play", 'Limited', 'Good', 'Better+', 'Excellent'];
+const RATING_COLORS = ['', '#FF4444', '#F0A500', '#7EEAA8', '#2ECC71', '#4A9EFF'];
+
+// ─── STATE ─────────────────────────────────────────────────────────────
+let sessions = JSON.parse(localStorage.getItem('drum_sessions_v2') || '[]');
+let streak = parseInt(localStorage.getItem('drum_streak') || '0');
+let lastSessionDate = localStorage.getItem('drum_last_session') || '';
+
+let currentBlock = 0;
+let timeLeft = BLOCKS[0].duration;
+let totalTime = BLOCKS[0].duration;
+let running = false;
+let timerInterval = null;
+let sessionStarted = false;
+let sessionComplete = false;
+let currentSessionBlocks = [];
+
+let logPanelBlockIdx = -1;
+let selectedRating = 0;
+let waitingForLog = false;
+
+// ─── PERSISTENCE ───────────────────────────────────────────────────────
+function saveState() {
+  localStorage.setItem('drum_sessions_v2', JSON.stringify(sessions));
+  localStorage.setItem('drum_streak', streak.toString());
+  localStorage.setItem('drum_last_session', lastSessionDate);
+}
+
+// ─── BPM SUGGESTION ────────────────────────────────────────────────────
+function suggestBPM(blockIdx) {
+  const history = sessions
+    .filter(s => s.blocks && s.blocks.some(b => b.blockIndex === blockIdx && !b.skipped))
+    .map(s => s.blocks.find(b => b.blockIndex === blockIdx))
+    .slice(-8);
+
+  if (history.length === 0) {
+    return { bpm: BLOCKS[blockIdx].defaultBpm, reason: 'default', direction: 'hold' };
+  }
+
+  const last = history[history.length - 1];
+  const lastBpm = last.bpm;
+  const lastRating = last.rating;
+
+  // Count consecutive sessions at rating 4+
+  let consecutive4 = 0;
+  for (let i = history.length - 1; i >= 0; i--) {
+    if (history[i].rating >= 4) consecutive4++;
+    else break;
+  }
+
+  if (lastRating === 1) {
+    return { bpm: Math.max(BLOCKS[blockIdx].minBpm, lastBpm - 10), reason: '−10 (rating 1)', direction: 'down' };
+  }
+  if (lastRating === 2) {
+    return { bpm: Math.max(BLOCKS[blockIdx].minBpm, lastBpm - 5), reason: '−5 (rating 2)', direction: 'down' };
+  }
+  if (lastRating === 3) {
+    return { bpm: lastBpm, reason: 'hold (rating 3)', direction: 'hold' };
+  }
+  // Rating 4 or 5
+  if (consecutive4 >= 3) {
+    return { bpm: Math.min(BLOCKS[blockIdx].targetBpm, lastBpm + 5), reason: `+5 (${consecutive4}× at 4+)`, direction: 'up' };
+  }
+  if (consecutive4 >= 2) {
+    return { bpm: Math.min(BLOCKS[blockIdx].targetBpm, lastBpm + 3), reason: `+3 (${consecutive4}× at 4+)`, direction: 'up' };
+  }
+  return { bpm: lastBpm, reason: `hold (need 2× at 4+ — you have ${consecutive4})`, direction: 'hold' };
+}
+
+function getLastBPM(blockIdx) {
+  const relevant = sessions
+    .filter(s => s.blocks && s.blocks.some(b => b.blockIndex === blockIdx && !b.skipped))
+    .map(s => s.blocks.find(b => b.blockIndex === blockIdx));
+  return relevant.length > 0 ? relevant[relevant.length - 1].bpm : BLOCKS[blockIdx].defaultBpm;
+}
+
+// ─── TIMER ─────────────────────────────────────────────────────────────
+function formatTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+function updateTimerDisplay() {
+  const el = document.getElementById('timer-display');
+  const nameEl = document.getElementById('timer-block-name');
+  const fill = document.getElementById('progress-fill');
+  const bpmHint = document.getElementById('timer-bpm-hint');
+  const pct = ((totalTime - timeLeft) / totalTime) * 100;
+
+  el.textContent = formatTime(timeLeft);
+  fill.style.width = pct + '%';
+
+  if (!sessionStarted) {
+    el.className = 'timer-display';
+    nameEl.className = 'timer-block-name';
+    nameEl.textContent = 'Press Start to Begin';
+    bpmHint.textContent = '';
+  } else if (sessionComplete) {
+    el.className = 'timer-display done';
+    nameEl.className = 'timer-block-name active';
+    nameEl.textContent = 'Session Complete';
+    bpmHint.textContent = '';
+  } else {
+    nameEl.textContent = BLOCKS[currentBlock].name;
+    nameEl.className = 'timer-block-name active';
+    const suggest = suggestBPM(currentBlock);
+    bpmHint.textContent = `Suggested: ${suggest.bpm} BPM`;
+    if (timeLeft <= 10) {
+      el.className = 'timer-display warning pulsing';
+    } else {
+      el.className = running ? 'timer-display running' : 'timer-display';
+    }
+  }
+
+  document.getElementById('streak-stat').textContent = streak;
+  document.getElementById('sessions-stat').textContent = sessions.length;
+  document.getElementById('streak-display').textContent = streak;
+}
+
+function highlightBlock(idx) {
+  document.querySelectorAll('.block-card').forEach((c, i) => {
+    c.classList.remove('active-block', 'completed-block', 'expanded');
+    if (i < idx) c.classList.add('completed-block');
+    if (i === idx) c.classList.add('active-block');
+  });
+}
+
+function startTimer() {
+  if (sessionComplete || waitingForLog) return;
+  sessionStarted = true;
+  running = true;
+  document.getElementById('start-btn').style.display = 'none';
+  document.getElementById('pause-btn').style.display = 'inline-block';
+  highlightBlock(currentBlock);
+
+  timerInterval = setInterval(() => {
+    if (timeLeft > 0) {
+      timeLeft--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      onBlockEnd();
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  running = false;
+  clearInterval(timerInterval);
+  document.getElementById('start-btn').style.display = 'inline-block';
+  document.getElementById('start-btn').textContent = '▶ Resume';
+  document.getElementById('pause-btn').style.display = 'none';
+  updateTimerDisplay();
+}
+
+function skipBlock() {
+  if (!sessionStarted || sessionComplete || waitingForLog) return;
+  clearInterval(timerInterval);
+  running = false;
+  onBlockEnd();
+}
+
+function onBlockEnd() {
+  document.querySelectorAll('.block-card')[currentBlock].classList.add('completed-block');
+  document.querySelectorAll('.block-card')[currentBlock].classList.remove('active-block');
+  addLog(`✓ ${BLOCKS[currentBlock].name} — log your BPM`, 'info');
+  showBlockLogPanel(currentBlock);
+}
+
+function advanceToNextBlock() {
+  if (currentBlock < BLOCKS.length - 1) {
+    currentBlock++;
+    timeLeft = BLOCKS[currentBlock].duration;
+    totalTime = BLOCKS[currentBlock].duration;
+    highlightBlock(currentBlock);
+    document.getElementById('start-btn').style.display = 'inline-block';
+    document.getElementById('start-btn').textContent = '▶ Resume';
+    document.getElementById('pause-btn').style.display = 'none';
+    updateTimerDisplay();
+    startTimer();
+  } else {
+    showSessionCompletePanel();
+  }
+}
+
+function resetAll() {
+  clearInterval(timerInterval);
+  running = false;
+  sessionStarted = false;
+  sessionComplete = false;
+  waitingForLog = false;
+  currentBlock = 0;
+  timeLeft = BLOCKS[0].duration;
+  totalTime = BLOCKS[0].duration;
+  currentSessionBlocks = [];
+
+  document.getElementById('start-btn').style.display = 'inline-block';
+  document.getElementById('start-btn').textContent = '▶ Start';
+  document.getElementById('pause-btn').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '0%';
+  document.getElementById('block-log-panel').classList.remove('show');
+  document.getElementById('session-complete-panel').classList.remove('show');
+  document.getElementById('timer-section').style.display = 'block';
+
+  document.querySelectorAll('.block-card').forEach((c, i) => {
+    c.classList.remove('active-block', 'completed-block');
+    if (i === 0) c.classList.add('expanded');
+  });
+
+  updateTimerDisplay();
+}
+
+function toggleExpand(idx) {
+  const card = document.getElementById('block-' + idx);
+  if (card.classList.contains('active-block')) return;
+  card.classList.toggle('expanded');
+}
+
+// ─── BLOCK LOG PANEL ───────────────────────────────────────────────────
+function showBlockLogPanel(blockIdx) {
+  waitingForLog = true;
+  logPanelBlockIdx = blockIdx;
+  selectedRating = 0;
+
+  const suggest = suggestBPM(blockIdx);
+  document.getElementById('log-panel-title').textContent = `Log — ${BLOCKS[blockIdx].shortName}`;
+  document.getElementById('log-panel-sub').textContent = `Suggested: ${suggest.bpm} BPM (${suggest.reason}). Enter what you actually played.`;
+  document.getElementById('bpm-input').value = suggest.bpm;
+
+  // Reset rating buttons
+  document.querySelectorAll('.rating-btn').forEach(btn => {
+    btn.className = 'rating-btn';
+  });
+
+  document.getElementById('block-log-panel').classList.add('show');
+  document.getElementById('timer-section').style.display = 'none';
+
+  // Scroll to panel
+  document.getElementById('block-log-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function adjustBpm(delta) {
+  const input = document.getElementById('bpm-input');
+  const val = parseInt(input.value) || 100;
+  input.value = Math.max(40, Math.min(300, val + delta));
+}
+
+function selectRating(r) {
+  selectedRating = r;
+  document.querySelectorAll('.rating-btn').forEach((btn, i) => {
+    btn.className = 'rating-btn';
+    if (i + 1 === r) btn.classList.add(`selected-${r}`);
+  });
+}
+
+function submitBlockLog(skipLog) {
+  const bpm = parseInt(document.getElementById('bpm-input').value) || BLOCKS[logPanelBlockIdx].defaultBpm;
+  const rating = skipLog ? 0 : selectedRating;
+
+  if (!skipLog && rating === 0) {
+    // Pulse the rating section
+    document.querySelectorAll('.rating-btn').forEach(b => {
+      b.style.borderColor = 'var(--amber)';
+      setTimeout(() => b.style.borderColor = '', 600);
+    });
+    return;
+  }
+
+  currentSessionBlocks.push({
+    blockIndex: logPanelBlockIdx,
+    bpm: bpm,
+    rating: rating,
+    skipped: skipLog
+  });
+
+  if (!skipLog) {
+    addLog(`B${logPanelBlockIdx + 1}: ${bpm} BPM — ${RATING_LABELS[rating]} (${rating}/5)`, 'success');
+  }
+
+  document.getElementById('block-log-panel').classList.remove('show');
+  document.getElementById('timer-section').style.display = 'block';
+  waitingForLog = false;
+  selectedRating = 0;
+
+  advanceToNextBlock();
+}
+
+// ─── SESSION COMPLETE ──────────────────────────────────────────────────
+function showSessionCompletePanel() {
+  sessionComplete = true;
+  running = false;
+  clearInterval(timerInterval);
+
+  // Update streak
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (lastSessionDate !== today) {
+    if (lastSessionDate === yesterday) {
+      streak++;
+    } else {
+      streak = 1;
+    }
+    lastSessionDate = today;
+  }
+
+  document.getElementById('timer-section').style.display = 'none';
+  document.getElementById('pause-btn').style.display = 'none';
+  document.getElementById('start-btn').style.display = 'none';
+
+  document.getElementById('complete-streak-text').textContent =
+    `${streak} day streak${streak > 1 ? ' 🔥' : ''} — Same time tomorrow.`;
+
+  // Build summary grid
+  const grid = document.getElementById('session-summary-grid');
+  grid.innerHTML = '';
+  currentSessionBlocks.forEach(b => {
+    if (b.skipped) return;
+    const card = document.createElement('div');
+    card.className = 'summary-block';
+    const color = b.rating > 0 ? RATING_COLORS[b.rating] : 'var(--muted)';
+    card.innerHTML = `
+      <div class="summary-block-name">${BLOCKS[b.blockIndex].shortName}</div>
+      <div class="summary-block-bpm">${b.bpm} <span style="font-size:16px;color:var(--muted)">BPM</span></div>
+      <div class="summary-block-rating" style="color:${color}">${b.rating > 0 ? `${b.rating}/5 — ${RATING_LABELS[b.rating]}` : 'Not rated'}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  document.getElementById('session-complete-panel').classList.add('show');
+  document.getElementById('session-complete-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function saveSession() {
+  const now = new Date();
+  const feedback = document.getElementById('feedback-textarea').value.trim();
+
+  const session = {
+    id: now.getTime(),
+    date: now.toISOString().split('T')[0],
+    time: now.toLocaleTimeString(),
+    blocks: currentSessionBlocks,
+    feedback: feedback,
+    streak: streak
+  };
+
+  sessions.push(session);
+  saveState();
+
+  addLog(`🔥 Session saved — ${streak} day streak`, 'success');
+  updateStats();
+  renderProgress();
+  renderHistory();
+  renderSuggestions();
+  renderTargets();
+}
+
+// ─── LOG ────────────────────────────────────────────────────────────────
+function addLog(msg, type) {
+  const container = document.getElementById('log-entries');
+  const empty = container.querySelector('.log-empty');
+  if (empty) empty.remove();
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  const now = new Date();
+  entry.textContent = `${now.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})} — ${msg}`;
+  container.insertBefore(entry, container.firstChild);
+}
+
+// ─── STATS ──────────────────────────────────────────────────────────────
+function updateStats() {
+  document.getElementById('streak-stat').textContent = streak;
+  document.getElementById('sessions-stat').textContent = sessions.length;
+  document.getElementById('streak-display').textContent = streak;
+
+  // Avg rating across all sessions
+  let allRatings = [];
+  sessions.forEach(s => {
+    if (s.blocks) s.blocks.forEach(b => { if (b.rating > 0) allRatings.push(b.rating); });
+  });
+  const avgRating = allRatings.length > 0
+    ? (allRatings.reduce((a,b) => a+b, 0) / allRatings.length).toFixed(1)
+    : '—';
+  document.getElementById('avg-rating-stat').textContent = avgRating;
+
+  // Best BPM across all exercises
+  let bestBpm = 0;
+  sessions.forEach(s => {
+    if (s.blocks) s.blocks.forEach(b => { if (b.bpm > bestBpm) bestBpm = b.bpm; });
+  });
+  document.getElementById('best-bpm-stat').textContent = bestBpm > 0 ? bestBpm : '—';
+}
+
+// ─── SUGGESTIONS ────────────────────────────────────────────────────────
+function renderSuggestions() {
+  const row = document.getElementById('suggestion-row');
+  row.innerHTML = '';
+  BLOCKS.forEach((block, i) => {
+    const suggest = suggestBPM(i);
+    const hasHistory = sessions.some(s => s.blocks && s.blocks.some(b => b.blockIndex === i && !b.skipped));
+    const chip = document.createElement('div');
+    chip.className = `suggestion-chip${hasHistory ? ' has-history' : ''}`;
+    const dirSymbol = suggest.direction === 'up' ? '↑' : suggest.direction === 'down' ? '↓' : '→';
+    chip.innerHTML = `
+      <div class="suggestion-chip-label">${block.shortName}</div>
+      <div class="suggestion-chip-bpm">${dirSymbol} ${suggest.bpm}</div>
+      <div class="suggestion-chip-reason">${suggest.reason}</div>
+    `;
+    row.appendChild(chip);
+
+    // Also update block card hint
+    const blockHint = document.getElementById(`block-suggest-${i}`);
+    if (blockHint) {
+      blockHint.textContent = `→ ${suggest.bpm} BPM`;
+    }
+  });
+}
+
+// ─── PROGRESS ───────────────────────────────────────────────────────────
+function renderProgress() {
+  const grid = document.getElementById('exercise-progress-grid');
+  grid.innerHTML = '';
+
+  BLOCKS.forEach((block, i) => {
+    const history = sessions
+      .filter(s => s.blocks && s.blocks.some(b => b.blockIndex === i && !b.skipped))
+      .map(s => s.blocks.find(b => b.blockIndex === i))
+      .slice(-5);
+
+    const suggest = suggestBPM(i);
+    const lastBpm = history.length > 0 ? history[history.length - 1].bpm : block.defaultBpm;
+    const lastRating = history.length > 0 ? history[history.length - 1].rating : 0;
+    const sessionCount = history.length;
+
+    const dirClass = suggest.direction === 'up' ? 'suggest-up' : suggest.direction === 'down' ? 'suggest-down' : 'suggest-hold';
+    const dirSymbol = suggest.direction === 'up' ? '↑' : suggest.direction === 'down' ? '↓' : '→';
+
+    // Last 5 ratings as dots
+    const dots = history.map(h => `<div class="mini-dot r${h.rating}"></div>`).join('');
+
+    const card = document.createElement('div');
+    card.className = 'ex-card';
+    card.innerHTML = `
+      <div class="ex-card-name">${block.shortName}</div>
+      <div class="ex-card-bpm">${lastBpm}</div>
+      <div class="ex-card-bpm-label">last BPM${lastRating > 0 ? ` · ${lastRating}/5` : ''}</div>
+      <div class="ex-card-suggest">
+        <span class="ex-card-suggest-arrow">Next:</span>
+        <span class="ex-card-suggest-bpm ${dirClass}">${dirSymbol} ${suggest.bpm}</span>
+      </div>
+      <div class="ex-card-sessions">${sessionCount} session${sessionCount !== 1 ? 's' : ''} logged</div>
+      <div class="mini-rating-dots">${dots || '<div style="font-size:9px;color:var(--muted);font-family:DM Mono,monospace;">no data</div>'}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderTargets() {
+  const container = document.getElementById('targets-container');
+  container.innerHTML = '';
+  const targetData = [
+    { name: 'Single stroke', blockIdx: 0, goal: 130 },
+    { name: 'Double stroke', blockIdx: 3, goal: 110 },
+    { name: 'Paradiddle', blockIdx: 1, goal: 110 },
+    { name: 'Fill at tempo', blockIdx: 2, goal: 120 },
+  ];
+  targetData.forEach(t => {
+    const currentBpm = getLastBPM(t.blockIdx);
+    const pct = Math.min(100, Math.round((currentBpm / t.goal) * 100));
+    const row = document.createElement('div');
+    row.className = 'target-row';
+    row.innerHTML = `
+      <div class="target-name">${t.name}</div>
+      <div class="target-bar"><div class="target-fill" style="width:${pct}%"></div></div>
+      <div class="target-now">${currentBpm}</div>
+      <div class="target-goal">→ ${t.goal}</div>
+    `;
+    container.appendChild(row);
+  });
+}
+
+// ─── HISTORY ────────────────────────────────────────────────────────────
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+
+  if (sessions.length === 0) {
+    list.innerHTML = '<div class="history-empty">No sessions logged yet. Complete your first drill.</div>';
+    return;
+  }
+
+  sessions.slice().reverse().slice(0, 20).forEach(s => {
+    const entry = document.createElement('div');
+    entry.className = 'history-entry';
+
+    const blocksHtml = (s.blocks || []).filter(b => !b.skipped).map(b => {
+      const color = b.rating > 0 ? RATING_COLORS[b.rating] : 'var(--muted)';
+      return `<div class="history-block-chip">
+        ${BLOCKS[b.blockIndex].shortName}<br>
+        <span class="chip-bpm">${b.bpm} BPM</span>
+        ${b.rating > 0 ? `<span style="color:${color}"> · ${b.rating}/5</span>` : ''}
+      </div>`;
+    }).join('');
+
+    const feedbackHtml = s.feedback
+      ? `<div class="history-feedback">"${s.feedback}"</div>`
+      : '';
+
+    entry.innerHTML = `
+      <div class="history-entry-header">
+        <div class="history-date">${s.date} · ${s.time}</div>
+        ${s.streak ? `<div class="history-streak">🔥 ${s.streak}d streak</div>` : ''}
+      </div>
+      <div class="history-blocks-row">${blocksHtml || '<span style="font-size:11px;color:var(--muted);font-family:DM Mono,monospace">No blocks logged</span>'}</div>
+      ${feedbackHtml}
+    `;
+    list.appendChild(entry);
+  });
+}
+
+// ─── TAB NAV ────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.remove('active');
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─── DATA EXPORT / IMPORT / CLEAR ───────────────────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify({ sessions, streak, lastSessionDate }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `drum-sessions-${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const data = JSON.parse(ev.target.result);
+        if (data.sessions) {
+          sessions = data.sessions;
+          streak = data.streak || 0;
+          lastSessionDate = data.lastSessionDate || '';
+          saveState();
+          init();
+          alert(`Imported ${sessions.length} sessions.`);
+        }
+      } catch (err) {
+        alert('Invalid JSON file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearData() {
+  if (!confirm('Delete all session history? This cannot be undone.')) return;
+  sessions = [];
+  streak = 0;
+  lastSessionDate = '';
+  saveState();
+  init();
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────
+function init() {
+  updateStats();
+  renderSuggestions();
+  renderProgress();
+  renderHistory();
+  renderTargets();
+  updateTimerDisplay();
+}
+
+init();
+</script>
+
+<!-- ─── DEPLOYMENT GUIDE ─── -->
+<!--
+HOW TO RUN ON YOUR IPHONE (no server needed)
+
+OPTION 1 — AirDrop (instant, recommended)
+  1. AirDrop this .html file from your Mac to your iPhone.
+  2. On iPhone, tap the AirDrop notification → opens in Files app.
+  3. Tap the file in Files → Safari opens it.
+  4. Tap Share → "Add to Home Screen" → name it "Drum Drill".
+  5. Done. All data saves in Safari's localStorage — persists between visits.
+
+OPTION 2 — Local network via Python server
+  1. On Mac, open Terminal in the folder containing this file.
+     cd ~/Downloads && python3 -m http.server 8080
+  2. Find your Mac's local IP:
+     System Settings → Wi-Fi → Details → IP Address (e.g. 192.168.1.42)
+  3. On iPhone (same Wi-Fi), open Safari → http://192.168.1.42:8080/drum-drill.html
+  4. Add to Home Screen for app feel.
+  Note: server must be running on Mac each time you use it.
+
+OPTION 3 — Export JSON to keep data safe
+  Use the History tab → Export JSON button to back up all your session data.
+  Import it back after reinstalling or on a new device.
+-->
+
+</body>
+</html>
